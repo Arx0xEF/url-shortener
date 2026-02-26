@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Submit URL</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        height: 100vh;
+        justify-content: center;
+        align-items: center;
+        background: #f0f0f0;
+    }
+
+    form {
+        background: #fff;
+        padding: 20px 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    input[type="text"] {
+        width: 300px;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        background: #007BFF;
+        color: #fff;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background: #0056b3;
+    }
+</style>
+</head>
+<body>
+
+<form>
+    <input type="text" name="link" id="urlinput" placeholder="Enter your URL" required>
+    <br>
+    <button id="urlbtn" type="submit">Submit</button>
+</form>
+<script>
+    let button = document.getElementById('urlbtn');
+    let input = document.getElementById('urlinput');
+    button.addEventListener('click', async function() {
+        event.preventDefault();
+        const url = input.value;
+        const headers = {
+            'Content-Type': 'application/json',
+        };
+        const body = JSON.stringify({url: url});
+
+        try {
+            const response = await fetch('/shorten', { method: 'POST', headers: headers, body: body });
+            if(!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log('Success:', data);
+        }
+        catch (error) {
+            console.error('Error:', error);
+        }
+    })
+</script>
+</body>
+</html>
