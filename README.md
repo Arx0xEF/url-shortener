@@ -68,7 +68,6 @@ CREATE TABLE urls (
     id INT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     orig_url TEXT NOT NULL,
     short_code TEXT UNIQUE NOT NULL,
-    clicks INT DEFAULT 0,
     created_at TIMESTAMP DEFAULT NOW()
 );
 
