@@ -9,18 +9,22 @@ function parseURL(urlq) {
     let parse_url;
     if(!urlq || typeof urlq !== "string") // check if it's a string
         return false;
+    /*
     if(!urlq.startsWith('http://') && !urlq.startsWith('https://')) {
        urlq = 'https://' + urlq;
     }
+       */
     try {
         parse_url = new URL(urlq);  
     }
     catch {
         return false;
     }
+    /*
     if(!(["http:", "https:"].includes(parse_url.protocol))) {
         return false;
     }
+        */
     return true;
 }
 
