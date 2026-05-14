@@ -6,41 +6,35 @@ const path = require('path');
 const fs = require('fs');
 
 function parseURL(urlq) {
-    let parse_url;
-    if(!urlq || typeof urlq !== "string") // check if it's a string
+    if(!urlq || typeof urlq !== "string")
         return false;
-    /*
+
     if(!urlq.startsWith('http://') && !urlq.startsWith('https://')) {
-       urlq = 'https://' + urlq;
+        urlq = 'https://' + urlq;
     }
-       */
+
     try {
-        parse_url = new URL(urlq);  
-    }
-    catch {
+        new URL(urlq);
+    } catch {
         return false;
     }
-    /*
-    if(!(["http:", "https:"].includes(parse_url.protocol))) {
-        return false;
-    }
-        */
-    return true;
+
+    return urlq;  // return fixed url
 }
 
 /*
 if(!response.headersSent) {
-            
+
         }
         */
-       
-       async function serverHome(request, response) {
-    let data; 
+
+async function serverHome(request, response) {
+    let data;
     try {
         data = await fs.promises.readFile(path.join(__dirname, 'index.html'));
     }
     catch (err)  {
-        console.log(`err: ${err}`);
+        console.error(`err: ${err}`);
         response.writeHead(500, {'Content-Type': 'application/json'});
         response.end(JSON.stringify({error: 'Internal Server Error'}));
         return;
@@ -51,6 +45,7 @@ if(!response.headersSent) {
 
 
 async function shortenURL(request, response) {
+    // console.log('shortenurl HIT');
     let data = [];
     request.on("data", (chunk) => {
         data.push(chunk);
@@ -71,7 +66,7 @@ async function shortenURL(request, response) {
             try {
                 buff_byte = JSON.parse(Buffer.concat(data).toString());
                 orig_url = buff_byte.url;
-                console.log(`HELLO HELLO ${orig_url}`);
+//                console.log(`HELLO HELLO ${orig_url}`);
             }
             catch(err) {
                 console.error(`Invalid JSON ${err}`);
@@ -90,7 +85,16 @@ async function shortenURL(request, response) {
             // inserting query text using parameterized values
             const text = 'INSERT INTO urls(orig_url, short_code) VALUES ($1, $2) RETURNING *';
             const values = [orig_url, shortCode];
-            const db_query = await db.query(text, values); 
+            // console.log(`orig_url ${orig_url}, short_code: ${shortCode}`);
+            let db_query;
+            try {
+                db_query = await db.query(text, values);
+            }
+            catch (err) {
+                console.error('Error Occurred', err);
+                throw err;
+            }
+            // console.error("inserted rows: ", db_query.rows);
             // send an http response header to the client
             response.writeHead(201, { 'Content-Type': 'application/json' });
             response.end(JSON.stringify({short_url: `http://localhost:5500/${shortCode}`}));
@@ -116,12 +120,14 @@ Order matters.
 */
 
 async function redirectURL(request, response) {
-    const shortCode = request.url.slice(1);
-    console.log(request.url);
+    const shortenPath = request.url.slice(1);
+    // console.log("request url: ", request.url);
 
     const text = 'SELECT orig_url FROM urls WHERE short_code = $1';
-    const value = [shortCode];
+    const value = [shortenPath];
+    // console.log("shtoendn",shortenPath);
     const result = await db.query(text, value);
+    //console.log("SELECT rows: ", result, " length: ", result.rows.length);
     if(result.rows.length === 0) {
         response.writeHead(404, {'Content-Type': 'application/json'});
         response.end(JSON.stringify({error: 'Short URL not found'}));
@@ -129,11 +135,12 @@ async function redirectURL(request, response) {
     }
     const text2 = 'INSERT INTO clicks (short_code, ip_addr) VALUES ($1, $2) RETURNING *';
     const ip = request.headers['x-forwarded-for'] || request.socket.remoteAddress;
-    const value2 = [shortCode, ip];
+    const value2 = [shortenPath, ip];
     const log_click = await db.query(text2, value2)
-    
-    const orig_url = result.rows[0].orig_url;
-    // console.log(orig_url);
+
+    let orig_url = result.rows[0].orig_url;
+    orig_url = 'https://' + orig_url;
+    // console.log("originalurl:", orig_url);
 
     response.writeHead(302, { 'Location': orig_url });
     response.end();
