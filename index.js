@@ -3,13 +3,7 @@
 const http = require('http');
 const db = require('./db');
 const routes = require('./routes');
- // const process = require('dotenv').config();
-
-const server = http.createServer(routes.checkUrlMethod);
 
 const PORT = process.env.PORT || 3000;
-///const PORT = process.env.PORT;
-
-// console.log(process.env.PORT);
-
+const server = http.createServer(routes.checkUrlMethod);
 server.listen( PORT, () => console.log(`\nRunning Serever at on PORT ${PORT}\n`));
