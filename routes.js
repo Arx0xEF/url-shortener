@@ -21,7 +21,7 @@ async function checkUrlMethod(request, response) {
         controller.serverHome(request, response);
     }
     else if(request.method === "POST" && request.url === "/shorten") {
-        // shorten  
+        // shorten
         controller.shortenURL(request, response);
     }
     else if(request.method === "GET" && request.url !== "/") {
