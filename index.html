@@ -49,10 +49,12 @@
     <input type="text" name="link" id="urlinput" placeholder="Enter your URL" required>
     <br>
     <button id="urlbtn" type="submit">Submit</button>
+    <p id="result"></p>
 </form>
 <script>
     let button = document.getElementById('urlbtn');
     let input = document.getElementById('urlinput');
+    let resulturl = document.getElementById('result');
     button.addEventListener('click', async function() {
         event.preventDefault();
         const url = input.value;
@@ -68,8 +70,10 @@
             }
             const data = await response.json();
             console.log('Success:', data);
+
+            resulturl.innerHTML = `Short URL: <a href="${data.short_url}" target="_blank"> ${data.short_url}</a>`;
         }
-        catch (error) {
+        catch(error) {
             console.error('Error:', error);
         }
     })
