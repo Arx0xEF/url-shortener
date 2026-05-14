@@ -16,11 +16,11 @@ console.log(`DB_PASSWORD: ${process.env.DB_PASSWORD}`);
 const { Pool } = pg;
 //console.log(`database_url: ${process.env.DATABASE_URL}`);
 const db = new Pool({
-host: 'localhost',
-  port: '5432',
-  database: 'url_shortener',
-  user: 'postgres',
-  password: 'Hwdd27j3d6is',
+host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
     ssl: { rejectUnauthorized: false }
 });
 
