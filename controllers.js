@@ -97,7 +97,7 @@ async function shortenURL(request, response) {
             // console.error("inserted rows: ", db_query.rows);
             // send an http response header to the client
             response.writeHead(201, { 'Content-Type': 'application/json' });
-            response.end(JSON.stringify({short_url: `http://localhost:5500/${shortCode}`}));
+            response.end(JSON.stringify({short_url: `https://${req.headers.host}/${shortCode}`}));
         }
         catch (error) {
             console.error("Server Eror: ", error);
